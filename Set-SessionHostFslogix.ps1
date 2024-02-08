@@ -172,7 +172,7 @@ try {
                                 Path         = 'HKLM:\Software\Policies\Microsoft\AzureADAccount'
                                 PropertyType = 'DWord'
                                 Value        = 1
-                        },
+                        }
 
                 )
         
