@@ -1,42 +1,44 @@
+cmdkey.exe /add:storageavdqwsac01.file.core.windows.net /user:localhost\storageavdqwsac01 /pass:SfVat5XFOnVxejepSNGrdN4NOmVFqU/YBOh2F1bQbBJ8dcP91yzqHNla6Cx/Q4BuIgEVNVg4p/tD+AStaIjdBA==
+
 $FslogixFileShare = "\\storageavdqwsac01.file.core.windows.net\fslogix"
 
 ##############################################################
 #  Functions
 ##############################################################
 function Write-Log {
-param(
-        [parameter(Mandatory)]
-        [string]$Message,
+        param(
+                [parameter(Mandatory)]
+                [string]$Message,
 
-        [parameter(Mandatory)]
-        [string]$Type
-)
-$Path = 'C:\Windows\Temp\AVDSessionHostConfig.log'
-if (!(Test-Path -Path $Path)) {
-        New-Item -Path 'C:\' -Name 'AVDSessionHostConfig.log' | Out-Null
-}
-$Timestamp = Get-Date -Format 'MM/dd/yyyy HH:mm:ss.ff'
-$Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
-$Entry | Out-File -FilePath $Path -Append
+                [parameter(Mandatory)]
+                [string]$Type
+        )
+        $Path = 'C:\Windows\Temp\AVDSessionHostConfig.log'
+        if (!(Test-Path -Path $Path)) {
+                New-Item -Path 'C:\' -Name 'AVDSessionHostConfig.log' | Out-Null
+        }
+        $Timestamp = Get-Date -Format 'MM/dd/yyyy HH:mm:ss.ff'
+        $Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
+        $Entry | Out-File -FilePath $Path -Append
 }
 
 function Get-WebFile {
-param(
-        [parameter(Mandatory)]
-        [string]$FileName,
+        param(
+                [parameter(Mandatory)]
+                [string]$FileName,
 
-        [parameter(Mandatory)]
-        [string]$URL
-)
-$Counter = 0
-do {
-        Invoke-WebRequest -Uri $URL -OutFile $FileName -ErrorAction 'SilentlyContinue'
-        if ($Counter -gt 0) {
-                Start-Sleep -Seconds 30
+                [parameter(Mandatory)]
+                [string]$URL
+        )
+        $Counter = 0
+        do {
+                Invoke-WebRequest -Uri $URL -OutFile $FileName -ErrorAction 'SilentlyContinue'
+                if ($Counter -gt 0) {
+                        Start-Sleep -Seconds 30
+                }
+                $Counter++
         }
-        $Counter++
-}
-until((Test-Path $FileName) -or $Counter -eq 9)
+        until((Test-Path $FileName) -or $Counter -eq 9)
 }
 
 $ErrorActionPreference = 'Stop'
@@ -108,89 +110,89 @@ try {
         #  Add Fslogix Settings
         ##############################################################
 
-                $Settings += @(
-                        # Enables Fslogix profile containers: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#enabled
-                        [PSCustomObject]@{
-                                Name         = 'Enabled'
-                                Path         = 'HKLM:\SOFTWARE\Fslogix\Profiles'
-                                PropertyType = 'DWord'
-                                Value        = 1
-                        },
-                        # Deletes a local profile if it exists and matches the profile being loaded from VHD: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#deletelocalprofilewhenvhdshouldapply
-                        [PSCustomObject]@{
-                                Name         = 'DeleteLocalProfileWhenVHDShouldApply'
-                                Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-                                PropertyType = 'DWord'
-                                Value        = 1
-                        },
-                        # The folder created in the Fslogix fileshare will begin with the username instead of the SID: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#flipflopprofiledirectoryname
-                        [PSCustomObject]@{
-                                Name         = 'FlipFlopProfileDirectoryName'
-                                Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-                                PropertyType = 'DWord'
-                                Value        = 1
-                        },
-                        # # Loads FRXShell if there's a failure attaching to, or using an existing profile VHD(X): https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#preventloginwithfailure
-                        # [PSCustomObject]@{
-                        #         Name         = 'PreventLoginWithFailure'
-                        #         Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-                        #         PropertyType = 'DWord'
-                        #         Value        = 1
-                        # },
-                        # # Loads FRXShell if it's determined a temp profile has been created: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#preventloginwithtempprofile
-                        # [PSCustomObject]@{
-                        #         Name         = 'PreventLoginWithTempProfile'
-                        #         Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-                        #         PropertyType = 'DWord'
-                        #         Value        = 1
-                        # },
-                        # List of file system locations to search for the user's profile VHD(X) file: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#vhdlocations
-                        [PSCustomObject]@{
-                                Name         = 'VHDLocations'
-                                Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-                                PropertyType = 'MultiString'
-                                Value        = $FslogixFileShare
-                        },
-                        [PSCustomObject]@{
-                                Name         = 'VolumeType'
-                                Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-                                PropertyType = 'MultiString'
-                                Value        = 'vhdx'
-                        }
-                )
+        $Settings += @(
+                # Enables Fslogix profile containers: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#enabled
+                [PSCustomObject]@{
+                        Name         = 'Enabled'
+                        Path         = 'HKLM:\SOFTWARE\Fslogix\Profiles'
+                        PropertyType = 'DWord'
+                        Value        = 1
+                },
+                # Deletes a local profile if it exists and matches the profile being loaded from VHD: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#deletelocalprofilewhenvhdshouldapply
+                [PSCustomObject]@{
+                        Name         = 'DeleteLocalProfileWhenVHDShouldApply'
+                        Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+                        PropertyType = 'DWord'
+                        Value        = 1
+                },
+                # The folder created in the Fslogix fileshare will begin with the username instead of the SID: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#flipflopprofiledirectoryname
+                [PSCustomObject]@{
+                        Name         = 'FlipFlopProfileDirectoryName'
+                        Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+                        PropertyType = 'DWord'
+                        Value        = 1
+                },
+                # # Loads FRXShell if there's a failure attaching to, or using an existing profile VHD(X): https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#preventloginwithfailure
+                # [PSCustomObject]@{
+                #         Name         = 'PreventLoginWithFailure'
+                #         Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+                #         PropertyType = 'DWord'
+                #         Value        = 1
+                # },
+                # # Loads FRXShell if it's determined a temp profile has been created: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#preventloginwithtempprofile
+                # [PSCustomObject]@{
+                #         Name         = 'PreventLoginWithTempProfile'
+                #         Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+                #         PropertyType = 'DWord'
+                #         Value        = 1
+                # },
+                # List of file system locations to search for the user's profile VHD(X) file: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#vhdlocations
+                [PSCustomObject]@{
+                        Name         = 'VHDLocations'
+                        Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+                        PropertyType = 'MultiString'
+                        Value        = $FslogixFileShare
+                },
+                [PSCustomObject]@{
+                        Name         = 'VolumeType'
+                        Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+                        PropertyType = 'MultiString'
+                        Value        = 'vhdx'
+                }
+        )
         
         
-                $Settings += @(
-                        [PSCustomObject]@{
-                                Name         = 'CloudKerberosTicketRetrievalEnabled'
-                                Path         = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters'
-                                PropertyType = 'DWord'
-                                Value        = 1
-                        },
-                        [PSCustomObject]@{
-                                Name         = 'LoadCredKeyFromProfile'
-                                Path         = 'HKLM:\Software\Policies\Microsoft\AzureADAccount'
-                                PropertyType = 'DWord'
-                                Value        = 1
-                        }
+        $Settings += @(
+                [PSCustomObject]@{
+                        Name         = 'CloudKerberosTicketRetrievalEnabled'
+                        Path         = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters'
+                        PropertyType = 'DWord'
+                        Value        = 1
+                },
+                [PSCustomObject]@{
+                        Name         = 'LoadCredKeyFromProfile'
+                        Path         = 'HKLM:\Software\Policies\Microsoft\AzureADAccount'
+                        PropertyType = 'DWord'
+                        Value        = 1
+                }
 
-                )
+        )
         
 
         ##############################################################
         #  Add Microsoft Entra ID Join Setting
         ##############################################################
         
-                $Settings += @(
+        $Settings += @(
 
-                        # Enable PKU2U: https://docs.microsoft.com/en-us/azure/virtual-desktop/troubleshoot-azure-ad-connections#windows-desktop-client
-                        [PSCustomObject]@{
-                                Name         = 'AllowOnlineID'
-                                Path         = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\pku2u'
-                                PropertyType = 'DWord'
-                                Value        = 1
-                        }
-                )
+                # Enable PKU2U: https://docs.microsoft.com/en-us/azure/virtual-desktop/troubleshoot-azure-ad-connections#windows-desktop-client
+                [PSCustomObject]@{
+                        Name         = 'AllowOnlineID'
+                        Path         = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\pku2u'
+                        PropertyType = 'DWord'
+                        Value        = 1
+                }
+        )
         
 
         # Set registry settings
@@ -262,9 +264,9 @@ try {
         #  Restart VM
         ##############################################################
         
-                Start-Process -FilePath 'shutdown' -ArgumentList '/r /t 30'
-        }
-        catch {
+        Start-Process -FilePath 'shutdown' -ArgumentList '/r /t 30'
+}
+catch {
         Write-Log -Message $_ -Type 'ERROR'
         throw
-        }
+}
