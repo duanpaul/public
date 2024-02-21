@@ -1,4 +1,4 @@
-$FslogixFileShare = "\\torageavdqwsac01.file.core.windows.net\fslogix"
+$FslogixFileShare = "\\storageavdqwsac01.file.core.windows.net\fslogix"
 
 ##############################################################
 #  Functions
