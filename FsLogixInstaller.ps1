@@ -38,7 +38,7 @@ Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller
 $VHDPath = "\\$StorageAccountName.file.core.windows.net\$ShareName\FSLogixProfile.vhdx"
 $RegPath = "HKLM:\SOFTWARE\FSLogix\Profiles"
 
-Write-Host "Configuring FSLogix profile container..."
+#Write-Host "Configuring FSLogix profile container..."
 New-Item -Path $RegPath -Force
 New-ItemProperty -Path $RegPath -Name "Enabled" -Value 1 -PropertyType DWORD -Force
 New-ItemProperty -Path $RegPath -Name "VHDLocations" -Value $VHDPath -PropertyType MultiString -Force
@@ -56,4 +56,4 @@ $TaskPrincipal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -Logon
 $Task = New-ScheduledTask -Action $TaskAction -Trigger $TaskTrigger -Settings $TaskSettings -Principal $TaskPrincipal
 Register-ScheduledTask -TaskName "DetachFSLogixProfile" -InputObject $Task -Force
 
-Write-Host "FSLogix configuration completed successfully."
+#Write-Host "FSLogix configuration completed successfully."
