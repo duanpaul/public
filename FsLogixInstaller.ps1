@@ -24,6 +24,7 @@ param (
     [string]$ShareName
 )
 
+<#
 # Install FSLogix agent
 Write-Host "Installing FSLogix agent..."
 $InstallerUri = "https://aka.ms/fslogix_download"
@@ -31,6 +32,7 @@ $InstallerPath = "$env:TEMP\fslogix_download.zip"
 Invoke-WebRequest -Uri $InstallerUri -OutFile $InstallerPath
 Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller"
 & "$env:TEMP\FSLogixInstaller\x64\Release\FSLogixAppsSetup.exe" /install /quiet
+#>
 
 # Configure FSLogix profile container
 $VHDPath = "\\$StorageAccountName.file.core.windows.net\$ShareName\FSLogixProfile.vhdx"
