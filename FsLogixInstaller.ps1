@@ -38,6 +38,11 @@ Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller
 $VHDPath = "\\$StorageAccountName.file.core.windows.net\$ShareName\FSLogixProfile.vhdx"
 $RegPath = "HKLM:\SOFTWARE\FSLogix\Profiles"
 
+# Export VHDPath and RegPath to a file
+"VHDPath: $VHDPath" | Out-File -FilePath C:\FSLogixConfigLog.txt -Append
+"RegPath: $RegPath" | Out-File -FilePath C:\FSLogixConfigLog.txt -Append
+
+try {
 #Write-Host "Configuring FSLogix profile container..."
 New-Item -Path $RegPath -Force
 New-ItemProperty -Path $RegPath -Name "Enabled" -Value 1 -PropertyType DWORD -Force
@@ -47,7 +52,12 @@ New-ItemProperty -Path $RegPath -Name "SizeInMBs" -Value 30720 -PropertyType DWO
 New-ItemProperty -Path $RegPath -Name "IsDynamic" -Value 1 -PropertyType DWORD -Force
 New-ItemProperty -Path $RegPath -Name "ConcurrentUserSessions" -Value 1 -PropertyType DWORD -Force
 New-ItemProperty -Path $RegPath -Name "AccountKeys" -Value $StorageAccountKey -PropertyType String -Force
+} catch {
+    $_ | Out-File -FilePath C:\FSLogixErrorLog.txt -Append
+}
 
+
+<#
 # Create a scheduled task to detach the profile container
 $TaskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `"& {Get-Process -Name 'explorer' | ForEach-Object {Stop-Process -Force -Id `$_.Id}}`""
 $TaskTrigger = New-ScheduledTaskTrigger -AtLogOn
@@ -57,3 +67,4 @@ $Task = New-ScheduledTask -Action $TaskAction -Trigger $TaskTrigger -Settings $T
 Register-ScheduledTask -TaskName "DetachFSLogixProfile" -InputObject $Task -Force
 
 #Write-Host "FSLogix configuration completed successfully."
+#>
