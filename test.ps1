@@ -32,8 +32,26 @@ $VHDPath | Out-File -FilePath C:\test.txt -Append
 $StorageAccountKey | Out-File -FilePath C:\test.txt -Append
 $RegPath | Out-File -FilePath C:\test.txt -Append
 
-cmdkey.exe /add:$StorageAccountName.file.core.windows.net /user:localhost\$StorageAccountName /pass:$StorageAccountKey
+$cmdkey = "cmdkey.exe /add:$StorageAccountName.file.core.windows.net /user:localhost\$StorageAccountName /pass:$StorageAccountKey"
+$cmdkey | Out-File -FilePath C:\test.txt -Append
 
+
+# Convert the storage account key to a secure string
+$secureKey = ConvertTo-SecureString -String $StorageAccountKey -AsPlainText -Force
+
+# Create a PSCredential object from the storage account name and secure key
+$credential = New-Object System.Management.Automation.PSCredential("$StorageAccountName", $secureKey)
+
+# Run the cmdkey command to add the storage account credentials to the Windows Credential Manager
+$cmdKeyArgs = "/add:$($StorageAccountName + ".file.core.windows.net") /user:AZURE\$StorageAccountName /pass:$($credential.GetNetworkCredential().Password)"
+$cmdKeyProcess = Start-Process -FilePath "cmdkey.exe" -ArgumentList $cmdKeyArgs -Wait -PassThru
+
+# Check the exit code of the cmdkey process
+if ($cmdKeyProcess.ExitCode -eq 0) {
+    "Storage account credentials added successfully." | Out-File -FilePath C:\test.txt -Append
+} else {
+    Write-Error "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
+}
 
 function Write-Log {
     param(
