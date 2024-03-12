@@ -49,21 +49,22 @@ $cmdKeyProcess = Start-Process -FilePath "cmdkey.exe" -ArgumentList $cmdKeyArgs 
 # Check the exit code of the cmdkey process
 if ($cmdKeyProcess.ExitCode -eq 0) {
     "Storage account credentials added successfully." | Out-File -FilePath C:\test.txt -Append
-} else {
+}
+else {
     Write-Error "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
 }
 
 function Write-Log {
     param(
-            [parameter(Mandatory)]
-            [string]$Message,
+        [parameter(Mandatory)]
+        [string]$Message,
 
-            [parameter(Mandatory)]
-            [string]$Type
+        [parameter(Mandatory)]
+        [string]$Type
     )
     $Path = 'C:\Windows\Temp\AVDSessionHostConfig.log'
     if (!(Test-Path -Path $Path)) {
-            New-Item -Path 'C:\' -Name 'AVDSessionHostConfig.log' | Out-Null
+        New-Item -Path 'C:\' -Name 'AVDSessionHostConfig.log' | Out-Null
     }
     $Timestamp = Get-Date -Format 'MM/dd/yyyy HH:mm:ss.ff'
     $Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
@@ -132,7 +133,7 @@ $Settings += @(
 foreach ($Setting in $Settings) {
     # Create registry key(s) if necessary
     if (!(Test-Path -Path $Setting.Path)) {
-            New-Item -Path $Setting.Path -Force
+        New-Item -Path $Setting.Path -Force
     }
 
     # Checks for existing registry setting
@@ -141,17 +142,55 @@ foreach ($Setting in $Settings) {
 
     # Creates the registry setting when it does not exist
     if (!$Value) {
-            New-ItemProperty -Path $Setting.Path -Name $Setting.Name -PropertyType $Setting.PropertyType -Value $Setting.Value -Force
-            Write-Log -Message "Added registry setting: $LogOutputValue" -Type 'INFO'
+        New-ItemProperty -Path $Setting.Path -Name $Setting.Name -PropertyType $Setting.PropertyType -Value $Setting.Value -Force
+        Write-Log -Message "Added registry setting: $LogOutputValue" -Type 'INFO'
     }
     # Updates the registry setting when it already exists
     elseif ($Value.$($Setting.Name) -ne $Setting.Value) {
-            Set-ItemProperty -Path $Setting.Path -Name $Setting.Name -Value $Setting.Value -Force
-            Write-Log -Message "Updated registry setting: $LogOutputValue" -Type 'INFO'
+        Set-ItemProperty -Path $Setting.Path -Name $Setting.Name -Value $Setting.Value -Force
+        Write-Log -Message "Updated registry setting: $LogOutputValue" -Type 'INFO'
     }
     # Writes log output when registry setting has the correct value
     else {
-            Write-Log -Message "Registry setting exists with correct value: $LogOutputValue" -Type 'INFO'    
+        Write-Log -Message "Registry setting exists with correct value: $LogOutputValue" -Type 'INFO'    
     }
     Start-Sleep -Seconds 1
 }
+
+##############################################################
+#  Run the Virtual Desktop Optimization Tool (VDOT)
+##############################################################
+# https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool
+        
+# Download VDOT
+$URL = 'https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool/archive/refs/heads/main.zip'
+$ZIP = 'VDOT.zip'
+Invoke-WebRequest -Uri $URL -OutFile $ZIP
+
+# Extract VDOT from ZIP archive
+Expand-Archive -LiteralPath $ZIP -Force
+
+# Fix to disable AppX Packages
+# As of 2/8/22, all AppX Packages are enabled by default
+$Files = (Get-ChildItem -Path .\VDOT\Virtual-Desktop-Optimization-Tool-main -File -Recurse -Filter "AppxPackages.json").FullName
+foreach ($File in $Files) {
+    $Content = Get-Content -Path $File
+    $Settings = $Content | ConvertFrom-Json
+    $NewSettings = @()
+    foreach ($Setting in $Settings) {
+        $NewSettings += [pscustomobject][ordered]@{
+            AppxPackage = $Setting.AppxPackage
+            VDIState    = 'Disabled'
+            URL         = $Setting.URL
+            Description = $Setting.Description
+        }
+    }
+
+    $JSON = $NewSettings | ConvertTo-Json
+    $JSON | Out-File -FilePath $File -Force
+}
+
+# Run VDOT
+& .\VDOT\Virtual-Desktop-Optimization-Tool-main\Windows_VDOT.ps1 -Optimizations 'All' -AdvancedOptimizations 'Edge', 'RemoveLegacyIE' -AcceptEULA
+
+Write-Log -Message 'Optimized the operating system using VDOT' -Type 'INFO'
