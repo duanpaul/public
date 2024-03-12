@@ -293,12 +293,13 @@ try {
         }
 
 
-
+<#
         ##############################################################
         #  Restart VM
         ##############################################################
         
         Start-Process -FilePath 'shutdown' -ArgumentList '/r /t 30'
+#>
 }
 catch {
         Write-Log -Message $_ -Type 'ERROR'
