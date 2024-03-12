@@ -1,6 +1,16 @@
-cmdkey.exe /add:storageavdqwsac01.file.core.windows.net /user:localhost\storageavdqwsac01 /pass:SfVat5XFOnVxejepSNGrdN4NOmVFqU/YBOh2F1bQbBJ8dcP91yzqHNla6Cx/Q4BuIgEVNVg4p/tD+AStaIjdBA==
+param (
+        [Parameter(Mandatory = $true)]
+        [string]$StorageAccountName,
 
-$FslogixFileShare = "\\storageavdqwsac01.file.core.windows.net\fslogix"
+        [Parameter(Mandatory = $true)]
+        [string]$StorageAccountKey,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ShareName
+)
+
+$FslogixFileShare = "\\$StorageAccountName.file.core.windows.net\$ShareName\"
+$Fslogix = $true
 
 ##############################################################
 #  Functions
@@ -258,6 +268,30 @@ try {
                 }
                 Write-Log -Message 'Enabled Defender exlusions for FSLogix processes' -Type 'INFO'
         }
+
+
+        ##############################################################
+        #  Add Storage Account credential key
+        ##############################################################
+        
+        # Convert the storage account key to a secure string
+        $secureKey = ConvertTo-SecureString -String $StorageAccountKey -AsPlainText -Force
+
+        # Create a PSCredential object from the storage account name and secure key
+        $credential = New-Object System.Management.Automation.PSCredential("$StorageAccountName", $secureKey)
+
+        # Run the cmdkey command to add the storage account credentials to the Windows Credential Manager
+        $cmdKeyArgs = "/add:$($StorageAccountName + ".file.core.windows.net") /user:AZURE\$StorageAccountName /pass:$($credential.GetNetworkCredential().Password)"
+        $cmdKeyProcess = Start-Process -FilePath "cmdkey.exe" -ArgumentList $cmdKeyArgs -Wait -PassThru
+
+        # Check the exit code of the cmdkey process
+        if ($cmdKeyProcess.ExitCode -eq 0) {
+                "Storage account credentials added successfully." | Out-File -FilePath C:\test.txt -Append
+        }
+        else {
+                "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
+        }
+
 
 
         ##############################################################
