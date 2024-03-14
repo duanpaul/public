@@ -34,8 +34,9 @@ $RegPath | Out-File -FilePath C:\test.txt -Append
 
 $cmdkey = "cmdkey.exe /add:$StorageAccountName.file.core.windows.net /user:localhost\$StorageAccountName /pass:$StorageAccountKey"
 $cmdkey | Out-File -FilePath C:\test.txt -Append
+$cmdkey
 
-
+<#
 # Convert the storage account key to a secure string
 $secureKey = ConvertTo-SecureString -String $StorageAccountKey -AsPlainText -Force
 
@@ -51,8 +52,9 @@ if ($cmdKeyProcess.ExitCode -eq 0) {
     "Storage account credentials added successfully." | Out-File -FilePath C:\test.txt -Append
 }
 else {
-    Write-Error "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
+    "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
 }
+#>
 
 function Write-Log {
     param(
