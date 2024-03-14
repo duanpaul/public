@@ -79,7 +79,7 @@ $FslogixFileShare = "\\$StorageAccountName.file.core.windows.net\$ShareName\"
 ##############################################################
 #  Add Fslogix Settings
 ##############################################################
-
+<#
 $Settings += @(
     # Enables Fslogix profile containers: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#enabled
     [PSCustomObject]@{
@@ -158,3 +158,5 @@ foreach ($Setting in $Settings) {
     }
     Start-Sleep -Seconds 1
 }
+
+#>
