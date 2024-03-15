@@ -1,5 +1,8 @@
+Set-ExecutionPolicy Bypass -Scope Process -Force
+"Hello, World!" | Out-File -FilePath C:\test.txt
 
 
+<#
 param (
     [Parameter(Mandatory = $true)]
     [string]$StorageAccountName,
@@ -21,6 +24,7 @@ Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller
 & "$env:TEMP\FSLogixInstaller\x64\Release\FSLogixAppsSetup.exe" /install /quiet
 #>
 
+<#
 # Configure FSLogix profile container
 $VHDPath = "\\$StorageAccountName.file.core.windows.net\$ShareName\FSLogixProfile.vhdx"
 $RegPath = "HKLM:\SOFTWARE\FSLogix\Profiles"
@@ -55,7 +59,7 @@ else {
     "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
 }
 #>
-
+<#
 function Write-Log {
     param(
         [parameter(Mandatory)]
@@ -159,4 +163,5 @@ foreach ($Setting in $Settings) {
     Start-Sleep -Seconds 1
 }
 
+#>
 #>
