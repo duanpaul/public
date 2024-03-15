@@ -2,7 +2,6 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 "Hello, World!" | Out-File -FilePath C:\test.txt
 
 
-<#
 param (
     [Parameter(Mandatory = $true)]
     [string]$StorageAccountName,
@@ -24,13 +23,10 @@ Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller
 & "$env:TEMP\FSLogixInstaller\x64\Release\FSLogixAppsSetup.exe" /install /quiet
 #>
 
-<#
+
 # Configure FSLogix profile container
 $VHDPath = "\\$StorageAccountName.file.core.windows.net\$ShareName\FSLogixProfile.vhdx"
 $RegPath = "HKLM:\SOFTWARE\FSLogix\Profiles"
-
-Set-ExecutionPolicy Bypass -Scope Process -Force
-"Hello, World!" | Out-File -FilePath C:\test.txt
 
 $VHDPath | Out-File -FilePath C:\test.txt -Append
 $StorageAccountKey | Out-File -FilePath C:\test.txt -Append
@@ -59,7 +55,7 @@ else {
     "Failed to add storage account credentials. Exit code: $($cmdKeyProcess.ExitCode)" | Out-File -FilePath C:\test.txt -Append
 }
 #>
-<#
+
 function Write-Log {
     param(
         [parameter(Mandatory)]
@@ -83,7 +79,7 @@ $FslogixFileShare = "\\$StorageAccountName.file.core.windows.net\$ShareName\"
 ##############################################################
 #  Add Fslogix Settings
 ##############################################################
-<#
+
 $Settings += @(
     # Enables Fslogix profile containers: https://docs.microsoft.com/en-us/fslogix/profile-container-configuration-reference#enabled
     [PSCustomObject]@{
@@ -162,6 +158,3 @@ foreach ($Setting in $Settings) {
     }
     Start-Sleep -Seconds 1
 }
-
-#>
-#>
