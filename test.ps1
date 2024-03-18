@@ -1,6 +1,3 @@
-Set-ExecutionPolicy Bypass -Scope Process -Force
-"Hello, World!" | Out-File -FilePath C:\test.txt
-
 
 param (
     [Parameter(Mandatory = $true)]
@@ -22,6 +19,8 @@ Invoke-WebRequest -Uri $InstallerUri -OutFile $InstallerPath
 Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller"
 & "$env:TEMP\FSLogixInstaller\x64\Release\FSLogixAppsSetup.exe" /install /quiet
 #>
+Set-ExecutionPolicy Bypass -Scope Process -Force
+"Hello, World!" | Out-File -FilePath C:\test.txt
 
 
 # Configure FSLogix profile container
