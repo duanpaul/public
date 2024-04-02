@@ -40,3 +40,19 @@ $eventLog = Get-WinEvent -FilterHashtable @{
 
 # Display the events
 $eventLog | Format-Table -AutoSize
+
+
+# powershell to join a computer to a domain with provided credentials and OU
+Add-Computer -DomainName "contoso.com" -Credential (Get-Credential) -OUPath "OU=Computers,OU=MyBusiness,DC=contoso,DC=com" -Restart
+Add-Computer -DomainName "contoso.com" -Credential (Get-Credential) -Restart
+
+# powershell to create a new ou
+New-ADOrganizationalUnit -Name "MyBusiness" -Path "DC=contoso,DC=com"
+
+# powershell to search windows application logs from source hyperspaceweb with event id 0 and include "epic.core.wrongwebserverexception" on a list of remote servers
+$computers = @("server1", "server2", "server3")
+foreach ($computer in $computers) {
+    $events = Get-WinEvent -ComputerName $computer -LogName Application -FilterXPath "*[System[Provider[@Name='HyperspaceWeb'] and (EventID=0)] and EventData[Data='epic.core.wrongwebserverexception']]"
+    $events | Format-Table -AutoSize
+}
+Get-WinEvent -LogName Application -FilterXPath "*[System[Provider[@Name='HyperspaceWeb'] and (EventID=0)] and EventData[Data='epic.core.wrongwebserverexception']]"
