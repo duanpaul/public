@@ -1,31 +1,45 @@
-
 ```mermaid
-graph LR
+
+graph TD
     subgraph Internet
-        C[Client]
+        User[User]
     end
 
-    subgraph GSLB
-        DNS[GSLB DNS]
+    subgraph "GSLB"
+        HyperspaceWeb   
     end
 
-    subgraph "Data Center 1 (New York)"
-        LB1[Load Balancer]
-        S1[Server 1]
-        S2[Server 2]
+    subgraph "Data Center 1"
+        subgraph "GSLB 1"
+            GSLB1[GSLB]
+        end
+
+        subgraph "Load Balancer 1"
+            LB1[Load Balancer]
+        end
+
+        subgraph "Application Servers 1"
+            AS1_1[App Server 1]
+            AS1_2[App Server 2]
+        end
     end
 
-    subgraph "Data Center 2 (London)"
-        LB2[Load Balancer]
-        SA[Server A]
-        SB[Server B]
+    subgraph "Data Center 2"
+        subgraph "GSLB 2"
+            GSLB2[GSLB]
+        end
+
+        subgraph "Load Balancer 2"
+            LB2[Load Balancer]
+        end
+
+        subgraph "Application Servers 2"
+            AS2_1[App Server 1]
+            AS2_2[App Server 2]
+        end
     end
 
- C -->|1. DNS Request| DNS
- DNS -->|2. IP Address London| C
-C -->|3. Application Requests| LB2
- LB2 -->|4. Route to Server A| SA
-    SA -->|5. Maintain Session| LB2
-    LB2 -->|6. Persist to Server A| SA
-    C -->|7. Subsequent Requests| LB2
-```
+    User --- HyperspaceWeb 
+    HyperspaceWeb  --- GSLB1
+    HyperspaceWeb  --- GSLB2
+

@@ -47,3 +47,28 @@ resource "azurerm_virtual_machine_extension" "install_ad" {
 
 # to get an existing virtual network and subnets in azure
 
+
+
+# to install and config citrix storefront server on azure vm
+resource "azurerm_virtual_machine_extension" "install_citrix_storefront" {
+  name                 = "install_citrix_storefront"
+  virtual_machine_id   = azurerm_windows_virtual_machine.dc02.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
+
+  protected_settings = <<SETTINGS
+  {
+    "commandToExecute": "powershell -command \"[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('${base64encode(data.template_file.CitrixStorefront.rendered)}')) | Out-File -filepath CitrixStorefront.ps1\" && powershell -ExecutionPolicy Unrestricted -File CitrixStorefront.ps1 -StorefrontURL ${var.storefront_url} -StorefrontPort ${var.storefront_port} -StorefrontSiteName ${var.storefront_site_name}"
+  }
+  SETTINGS
+}
+
+data "template_file" "CitrixStorefront" {
+  template = "${file("CitrixStorefront.ps1")}"
+  vars = {
+    storefront_url       = "${var.storefront_url}"
+    storefront_port      = "${var.storefront_port}"
+    storefront_site_name = "${var.storefront_site_name}"
+  }
+}
