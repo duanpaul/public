@@ -127,6 +127,18 @@ $Settings += @(
         Path         = 'HKLM:\SOFTWARE\FSLogix\Profiles'
         PropertyType = 'MultiString'
         Value        = 'vhdx'
+    },
+    [PSCustomObject]@{
+        Name         = 'CloudKerberosTicketRetrievalEnabled'
+        Path         = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters'
+        PropertyType = 'DWord'
+        Value        = 1
+    },
+    [PSCustomObject]@{
+        Name         = 'CloudKerberosTicketRetrievalEnabled'
+        Path         = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters'
+        PropertyType = 'DWord'
+        Value        = 1
     }
 )
 
