@@ -31,10 +31,11 @@ $VHDPath | Out-File -FilePath C:\test.txt -Append
 $StorageAccountKey | Out-File -FilePath C:\test.txt -Append
 $RegPath | Out-File -FilePath C:\test.txt -Append
 
+<#
 $cmdkey = "cmdkey.exe /add:$StorageAccountName.file.core.windows.net /user:localhost\$StorageAccountName /pass:$StorageAccountKey"
 $cmdkey | Out-File -FilePath C:\test.txt -Append
 $cmdkey
-
+#>
 <#
 # Convert the storage account key to a secure string
 $secureKey = ConvertTo-SecureString -String $StorageAccountKey -AsPlainText -Force
@@ -169,3 +170,7 @@ foreach ($Setting in $Settings) {
     }
     Start-Sleep -Seconds 1
 }
+
+
+# Reboot the machine
+Restart-Computer -Force
