@@ -1,4 +1,4 @@
-<#
+
 param (
     [Parameter(Mandatory = $true)]
     [string]$StorageAccountName,
@@ -56,7 +56,6 @@ else {
 }
 #>
 
-<#
 function Write-Log {
     param(
         [parameter(Mandatory)]
@@ -172,7 +171,6 @@ foreach ($Setting in $Settings) {
     Start-Sleep -Seconds 1
 }
 
+
 # Reboot the machine
 Restart-Computer -Force
-
-#>
