@@ -109,31 +109,9 @@ try {
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
     Set-Location -Path "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main"
 
-    # Patch: Disable Set-NetAdapterAdvancedProperty
-    $UpdatePath = "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main\Windows_VDOT.ps1"
-    ((Get-Content -Path $UpdatePath -Raw) -replace 'Set-NetAdapterAdvancedProperty -DisplayName "Send Buffer Size" -DisplayValue 4MB', '#Set-NetAdapterAdvancedProperty -DisplayName "Send Buffer Size" -DisplayValue 4MB') | Set-Content -Path $UpdatePath
-    Write-Log -Message 'Patched Set-NetAdapterAdvancedProperty setting' -Type 'INFO'
-
-    # Run VDOT with specific optimizations
+    # Run VDOT with basic parameters
     Write-Log -Message 'Starting VDOT optimization process' -Type 'INFO'
-    
-    $VDOTParams = @{
-        Optimizations = @(
-            'AppxPackages',
-            'Autologgers',
-            'DefaultUserSettings',
-            'LGPO',
-            'NetworkOptimizations',
-            'ScheduledTasks',
-            'Services',
-            'WindowsMediaPlayer'
-        )
-        AdvancedOptimizations = @('Edge', 'RemoveLegacyIE')
-        AcceptEULA = $true
-        Verbose = $true
-    }
-
-    & .\Windows_VDOT.ps1 @VDOTParams
+    & .\Windows_VDOT.ps1 -Verbose -AcceptEula
     Write-Log -Message 'Completed VDOT optimization process' -Type 'INFO'
 
 } catch {
