@@ -64,7 +64,7 @@ function Write-Log {
         [parameter(Mandatory)]
         [string]$Type
     )
-    $Path = 'C:\Windows\Temp\AVDSessionHostConfig.log'
+    $Path = 'C:\Temp\AVDSessionHostConfig.log'
     if (!(Test-Path -Path $Path)) {
         New-Item -Path 'C:\' -Name 'AVDSessionHostConfig.log' | Out-Null
     }
