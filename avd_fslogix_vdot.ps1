@@ -442,12 +442,12 @@ try {
     
     # Run VDOT first time with basic parameters
     Write-Log -Message 'Starting initial VDOT optimization process' -Type 'INFO'
-    $vdotOutput = & .\Windows_VDOT.ps1 -Verbose -AcceptEula 2>&1 | Out-String
+    $vdotOutput = & "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main\Windows_VDOT.ps1" -Verbose -AcceptEula 2>&1 | Out-String
     Write-Log -Message "VDOT Output: $vdotOutput" -Type 'INFO'
 
     # Run VDOT second time with AppxPackages optimization
     Write-Log -Message 'Starting VDOT AppxPackages optimization' -Type 'INFO'
-    $vdotOutput = & .\Windows_VDOT.ps1 -Optimizations AppxPackages -AcceptEula -Verbose 2>&1 | Out-String
+    $vdotOutput = & "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main\Windows_VDOT.ps1" -Optimizations AppxPackages -AcceptEula -Verbose 2>&1 | Out-String
     Write-Log -Message "VDOT AppxPackages Output: $vdotOutput" -Type 'INFO'
 
 } catch {
