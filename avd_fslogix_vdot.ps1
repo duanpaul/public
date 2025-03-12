@@ -438,6 +438,15 @@ try {
     $appxJson | Out-File -FilePath $appxJsonPath -Force -Encoding UTF8
     Write-Log -Message "Created AppxPackages.json at $appxJsonPath" -Type 'INFO'
 
+    # Replace the built-in AppxPackages.json with our custom one
+    $builtinConfigPath = "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main\2009\ConfigurationFiles\AppxPackages.json"
+    if (Test-Path $builtinConfigPath) {
+        Copy-Item -Path $appxJsonPath -Destination $builtinConfigPath -Force
+        Write-Log -Message "Replaced built-in AppxPackages.json at $builtinConfigPath" -Type 'INFO'
+    } else {
+        Write-Log -Message "Built-in AppxPackages.json not found at $builtinConfigPath" -Type 'WARNING'
+    }
+
     Set-Location -Path "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main"
     
     # Run VDOT first time with basic parameters
