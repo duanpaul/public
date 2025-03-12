@@ -438,6 +438,8 @@ try {
     $appxJson | Out-File -FilePath $appxJsonPath -Force -Encoding UTF8
     Write-Log -Message "Created AppxPackages.json at $appxJsonPath" -Type 'INFO'
 
+    Set-Location -Path "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main"
+    
     # Run VDOT first time with basic parameters
     Write-Log -Message 'Starting initial VDOT optimization process' -Type 'INFO'
     $vdotOutput = & .\Windows_VDOT.ps1 -Verbose -AcceptEula 2>&1 | Out-String
