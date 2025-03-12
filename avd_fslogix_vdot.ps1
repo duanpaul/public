@@ -442,11 +442,15 @@ try {
     
     # Run VDOT first time with basic parameters
     Write-Log -Message 'Starting initial VDOT optimization process' -Type 'INFO'
+    $currentLocation = Get-Location | Select-Object -ExpandProperty Path
+    Write-Log -Message "Current working directory: $currentLocation" -Type 'INFO'
     $vdotOutput = & "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main\Windows_VDOT.ps1" -Verbose -AcceptEula 2>&1 | Out-String
     Write-Log -Message "VDOT Output: $vdotOutput" -Type 'INFO'
 
     # Run VDOT second time with AppxPackages optimization
     Write-Log -Message 'Starting VDOT AppxPackages optimization' -Type 'INFO'
+    $currentLocation = Get-Location | Select-Object -ExpandProperty Path
+    Write-Log -Message "Current working directory: $currentLocation" -Type 'INFO'
     $vdotOutput = & "$WorkingDirectory\Virtual-Desktop-Optimization-Tool-main\Windows_VDOT.ps1" -Optimizations AppxPackages -AcceptEula -Verbose 2>&1 | Out-String
     Write-Log -Message "VDOT AppxPackages Output: $vdotOutput" -Type 'INFO'
 
