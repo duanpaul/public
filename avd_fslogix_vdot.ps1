@@ -20,6 +20,10 @@ Expand-Archive -Path $InstallerPath -DestinationPath "$env:TEMP\FSLogixInstaller
 & "$env:TEMP\FSLogixInstaller\x64\Release\FSLogixAppsSetup.exe" /install /quiet
 #>
 Set-ExecutionPolicy Bypass -Scope Process -Force
+
+# -------------------------------------------------------------------
+#    Example to verify it worked
+# -------------------------------------------------------------------
 "Hello, World!" | Out-File -FilePath C:\test.txt
 
 
@@ -71,6 +75,47 @@ function Write-Log {
     $Timestamp = Get-Date -Format 'MM/dd/yyyy HH:mm:ss.ff'
     $Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
     $Entry | Out-File -FilePath $Path -Append
+}
+
+# -------------------------------------------------------------------
+#    Check and Install FSLogix if NOT already installed
+# -------------------------------------------------------------------
+try {
+  # Try to retrieve the FSLogix service (named "frxsvc")
+  $fslogixService = Get-Service -Name "frxsvc" -ErrorAction SilentlyContinue
+
+  if ($fslogixService) {
+      Write-Log -Message "FSLogix agent is already installed. Skipping installation." -Type 'INFO'
+  }
+  else {
+      Write-Log -Message "FSLogix agent not found. Proceeding with installation." -Type 'INFO'
+      $InstallerUri   = "https://aka.ms/fslogix_download"
+      $InstallerPath  = "$env:TEMP\fslogix_download.zip"
+      $ExpandPath     = "$env:TEMP\FSLogixInstaller"
+      $SetupExe       = "$ExpandPath\x64\Release\FSLogixAppsSetup.exe"
+
+      if (Test-Path $InstallerPath) {
+          Remove-Item $InstallerPath -Force
+      }
+      if (Test-Path $ExpandPath) {
+          Remove-Item $ExpandPath -Recurse -Force
+      }
+
+      # Download FSLogix
+      Invoke-WebRequest -Uri $InstallerUri -OutFile $InstallerPath -UseBasicParsing
+
+      # Expand the archive
+      Expand-Archive -Path $InstallerPath -DestinationPath $ExpandPath -Force
+
+      # Run the FSLogix installer silently
+      & $SetupExe /install /quiet
+
+      Write-Log -Message "FSLogix agent installation has completed." -Type 'INFO'
+  }
+}
+catch {
+  Write-Log -Message "Error while checking or installing FSLogix: $($_.Exception.Message)" -Type 'ERROR'
+  throw
 }
 
 ##############################################################
